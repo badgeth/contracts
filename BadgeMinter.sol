@@ -1,7 +1,5 @@
 pragma solidity ^0.8.0;
 
-// import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v2.4.0/contracts/utils/Counters.sol";
-// import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./lib/openzeppelin/utils/Counters.sol";
 import "./lib/openzeppelin/token/ERC721/ERC721.sol";
 import "./lib/openzeppelin/access/Ownable.sol";
