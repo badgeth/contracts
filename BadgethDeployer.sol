@@ -1,18 +1,20 @@
-pragma solidity ^0.7.2;
+pragma solidity ^0.8.0;
 
 import "./BadgeFactory.sol";
+
 
 contract BadgethDeployer {
     
     address public governance;
+    address public badgeFactory;
     
-    constructor() public {
+    constructor() {
         governance = msg.sender;
+        badgeFactory = deployBadgeFactory();
     }
     
-    function deployBadgeFactory() public {
+    function deployBadgeFactory() public returns (address) {
         require(msg.sender == governance, "!governance");
-        
-        new BadgeFactory(governance);
+        return address(new BadgeFactory(governance));
     }
 }

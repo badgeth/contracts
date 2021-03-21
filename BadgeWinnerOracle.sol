@@ -1,40 +1,42 @@
 // BadgeBridge contract is responsible for storing valid badge redemptions on chain.
 
-pragma solidity ^0.7.2;
+pragma solidity ^0.8.0;
 
-import "./BadgeFactory.sol";
+import "./BadgeMinter.sol";
 
 
 contract BadgeWinnerOracle {
 
-    // maps Badge minter addresses to mappings of (BadgeMinter contracts -> valid claimers
+    // maps BadgeMinter addresses to mappings of (valid claimers -> claim props)
     mapping (address => mapping (address => BadgeClaimProps)) public validClaimsMap;
-    address public badgeFactoryAddress;
+    address public validatorAddress;
     
-    constructor() public {
-        // todo: only allow deployment from BadgeFactory contracts
-        badgeFactoryAddress = msg.sender;
+    constructor(address _validatorAddress) {
+        validatorAddress = _validatorAddress;
     }
 
-    // any unique properties worth storing for this individual NFT
     // todo: refactor using flags for storage efficiency
     struct BadgeClaimProps {
-        bool expires;           // some claims might have a deadline for minting
-        bool isFinalized;       // work-around for Solidity mappings initializing values to 0.
+        bool isReadyToMint;
+        bool wasMinted;
     }
     
-    // todo: only allow governance to call storeBadgeClaims
     function storeBadgeClaims(address[] memory claimerAddresses, address badgeAddress) public {
+        require(msg.sender == validatorAddress, "!validator");
+        
         for (uint i = 0; i < claimerAddresses.length; i++) {
-            BadgeClaimProps memory claimProps = BadgeClaimProps(false, true);
-            claimProps.isFinalized = true;
+            BadgeClaimProps memory claimProps = BadgeClaimProps(true, false);
             validClaimsMap[badgeAddress][claimerAddresses[i]] = claimProps;
         }
     }
     
-    // called from badge minting contracts
-    function isClaimValid(address badgeWinnerAddress) public returns (bool) {
-        BadgeClaimProps memory props = validClaimsMap[msg.sender][badgeWinnerAddress];
-        return props.isFinalized;
+    function processClaim(address badgeAddress, address winnerAddress) public {
+        BadgeClaimProps storage claimProps = validClaimsMap[badgeAddress][winnerAddress];
+        
+        require (claimProps.isReadyToMint == true, "!isReadyToMint");
+        
+        BadgeMinter minterContract = BadgeMinter(badgeAddress);
+        minterContract.awardBadge(winnerAddress);
+        claimProps.wasMinted = true;
     }
 }
