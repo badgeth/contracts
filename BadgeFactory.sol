@@ -13,14 +13,14 @@ contract BadgeFactory {
     event BadgeDefinitionCreated(address minterAddress, string gqlQuery, string subgraphName);
 
     address public governance;
-    address public VoucherOracle;
-    address public VoucherCuration;
+    address public voucherOracle;
+    address public voucherCuration;
 
     constructor(address _factoryGovernance) {
         governance = _factoryGovernance;
-        VoucherOracle = address(new VoucherOracle(governance));
-        VoucherCuration = address(new VoucherCuration(VoucherOracle));
-        VoucherOracle.addWhitelistedAddress(VoucherCuration);
+        voucherOracle = address(new VoucherOracle(governance));
+        voucherCuration = address(new VoucherCuration(VoucherOracle));
+        voucherOracle.addWhitelistedAddress(VoucherCuration);
         // todo: deploy BadgeClaimMiningContract
     }
 

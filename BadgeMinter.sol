@@ -12,19 +12,19 @@ contract BadgeMinter is ERC721 {
     Counters.Counter private _badgeIds;
 
     address public badgeAuthor;
-    address public VoucherOracle;
+    address public voucherOracle;
     string private ipfsURI;
 
     constructor(
         address _badgeAuthor,
-        address _VoucherOracle,
+        address _voucherOracle,
         string memory _name,
         string memory _symbol,
         string memory _ipfsURI
         ) ERC721(_name, _symbol)
     {
         badgeAuthor = _badgeAuthor;
-        VoucherOracle = _VoucherOracle;
+        voucherOracle = _voucherOracle;
         ipfsURI = _ipfsURI;
     }
 
@@ -33,7 +33,7 @@ contract BadgeMinter is ERC721 {
     }
 
     function awardBadge(address winnerAddress) public {
-        require(msg.sender == VoucherOracle, "not whitelisted to mint badges");
+        require(msg.sender == voucherOracle, "not whitelisted to mint badges");
 
         _badgeIds.increment();
         uint256 newBadgeId = _badgeIds.current();
