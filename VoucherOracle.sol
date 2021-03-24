@@ -10,7 +10,7 @@ contract VoucherOracle {
     mapping (address => mapping (address => BadgeClaimProps)) public validClaimsMap;
     mapping(address => uint8) public whitelistedCurators;
 
-    constructor(address memory _whitelistedCurator) {
+    constructor(address _whitelistedCurator) {
       addWhitelistedAddress(_whitelistedCurator);
       addWhitelistedAddress(msg.sender);
     }
