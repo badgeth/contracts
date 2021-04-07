@@ -11,10 +11,9 @@ contract BadgeRecipientOracle {
 
     // maps BadgeMinter addresses to mappings of (valid claimers -> claim props)
     mapping (address => mapping (address => BadgethStructs.VoucherProps)) public validClaimsMap;
-    mapping(address => bool) public whitelistedCurators;
+    mapping (address => bool) public whitelistedCurators;
 
-    constructor(address _whitelistedCurator) {
-        whitelistedCurators[_whitelistedCurator] = true;
+    constructor() {
         whitelistedCurators[msg.sender] = true;
     }
 

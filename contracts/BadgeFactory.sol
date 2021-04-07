@@ -1,8 +1,5 @@
 // SPDX-License-Identifier: MIT
 
-// BadgeFactory contract deploys BadgeMinter contracts for each badge definition
-// BadgeFactory contract deploys a BadgeRecipientOracle contract for validating mint calls to BadgeMinter contracts
-
 pragma solidity ^0.8.0;
 
 import "./BadgeMinter.sol";
@@ -12,15 +9,23 @@ import "./BadgeRecipientCuration.sol";
 
 contract BadgeFactory {
 
-    event BadgeDefinitionCreated(string gqlQuery, string subgraphName);
-    event NFTBadgeDefinitionCreated(address minterAddress, string gqlQuery, string subgraphName);
+    event BadgeDefinitionCreated(string badgeName, string entity, string property, bool preAwardValue, bool postAwardValue);
 
     address public governance;
     address public badgeRecipientOracle;
-    address public badgeRecipientCuration; // todo
+    address public badgeRecipientCuration; // not implemented
 
-    constructor(address _factoryGovernance) {
-        governance = _factoryGovernance;
+    string public queryURL;
+
+    constructor(string memory _queryURL) {
+        governance = msg.sender;
+        queryURL = _queryURL;
+    }
+
+    function setQueryURL(string memory queryURLString) public {
+        require (msg.sender == governance, "!governance");
+
+        queryURL = queryURLString;
     }
 
     function setBadgeRecipientOracle(address oracleAddress) public {
@@ -36,28 +41,15 @@ contract BadgeFactory {
     }
 
     function createBadgeDefinition(
-        string calldata gqlQuery,
-        string calldata subgraphName,
         string calldata badgeName,
-        string calldata ipfsURI
-        ) public {
-
+        string calldata entity,
+        string calldata property,
+        bool preAwardValue,
+        bool postAwardValue) public {
+            
         require (msg.sender == governance, "!governance");
 
-        emit BadgeDefinitionCreated(gqlQuery, subgraphName);
-    }
-
-    function createNFTBadgeDefinition(
-        string calldata gqlQuery,
-        string calldata subgraphName,
-        string calldata badgeName,
-        string calldata ipfsURI
-        ) public {
-
-        require (msg.sender == governance, "!governance");
-
-        BadgeMinter minterContract = new BadgeMinter(msg.sender, badgeRecipientOracle, badgeName, "", ipfsURI);
-        emit NFTBadgeDefinitionCreated(address(minterContract), gqlQuery, subgraphName);
+        emit BadgeDefinitionCreated(badgeName, entity, property, preAwardValue, postAwardValue);
     }
 
 }
