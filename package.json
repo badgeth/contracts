@@ -2,5 +2,13 @@
   "dependencies": {
     "openzeppelin-solidity": "^4.0.0",
     "truffle": "^5.3.0"
+  },
+  "scripts": {
+    "truffle-console": "./node_modules/.bin/truffle console",
+    "truffle-compile": "./node_modules/.bin/truffle compile",
+    "truffle-compile!": "./node_modules/.bin/truffle compile --all",
+    "truffle-migrate": "./node_modules/.bin/truffle migrate",
+    "truffle-migrate!": "./node_modules/.bin/truffle migrate --reset",
+    "truffle-test": "./node_modules/.bin/truffle test --show-events"
   }
 }
