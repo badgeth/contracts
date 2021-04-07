@@ -1,10 +1,9 @@
 # BadgethContracts
 
-## Control Flow
+## Build Instructions
 
-1. Deploy BadgethDeployer
-2. Call BadgethDeployer's badgeFactory function to get the address of the deployed BadgeFactory contract
-3. Call BadgeFactory's createBadgeDefinition function. This deploys a BadgeMinter contract and emits an event with the contrat's address
-4. Call BadgeFactory's VoucherOracle function to get the address of the deployed VoucherOracle contract
-5. Call VoucherOracle's storeBadgeClaims function.
-6. Call VoucherOracle's processBadgeClaims function and check to make sure an nft was minted for the winner.
+1. Start Ganache
+2. ```npm install```
+3. ```./node_modules/.bin/truffle compile```
+4. ```./node_modules/.bin/truffle migrate```
+5. ```./node_modules/.bin/truffle test```
