@@ -18,8 +18,9 @@
  *
  */
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
-// const infuraKey = "fj4jll3k.....";
+require('dotenv').config()
+const HDWalletProvider = require('truffle-hdwallet-provider')
+
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
@@ -48,7 +49,13 @@ module.exports = {
      network_id: "*",       // Any network (default: none)
      gas: 672197500,
      gasPrice: 22000000
-    }
+    },    
+    ropsten: {
+      provider: () => new HDWalletProvider(
+        process.env.MNEMONIC,
+        process.env.ROPSTEN_URL),
+      network_id: 3
+    },
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port

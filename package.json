@@ -1,10 +1,13 @@
 {
   "dependencies": {
+    "dotenv": "^8.2.0",
     "openzeppelin-solidity": "^4.0.0",
-    "truffle": "^5.3.0"
+    "truffle": "^5.3.0",
+    "truffle-hdwallet-provider": "^1.0.17"
   },
   "scripts": {
     "truffle-console": "./node_modules/.bin/truffle console",
+    "truffle-console-ropsten": "./node_modules/.bin/truffle console --network ropsten",
     "truffle-compile": "./node_modules/.bin/truffle compile",
     "truffle-compile!": "./node_modules/.bin/truffle compile --all",
     "truffle-migrate": "./node_modules/.bin/truffle migrate",
