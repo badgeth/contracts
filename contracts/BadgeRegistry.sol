@@ -18,8 +18,8 @@ contract BadgeRegistry {
     // subgraph -> version -> recipientAddresses -> maturityBlock
     mapping (string => mapping (int => mapping (address => uint))) public badgeRecipients;
 
-    constructor(uint _minimumBlocksForBadgeMaturity) {
-        owner = msg.sender;
+    constructor(address _owner, uint _minimumBlocksForBadgeMaturity) {
+        owner = _owner;
         minimumBlocksForBadgeMaturity = _minimumBlocksForBadgeMaturity;
     }
 

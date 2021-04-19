@@ -1,9 +1,6 @@
-const BadgeFactory = artifacts.require("BadgeFactory");
-const BadgeRecipientOracle = artifacts.require("BadgeRecipientOracle");
-
+const BadgeRegistry = artifacts.require("BadgeRegistry");
 
 module.exports = function(deployer, network, accounts) {
   let owner = accounts[0];
-  deployer.deploy(BadgeFactory, "first 100 owners query");
-  deployer.deploy(BadgeRecipientOracle);
+  deployer.deploy(BadgeRegistry, owner, 0);
 };
