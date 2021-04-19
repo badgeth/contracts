@@ -56,6 +56,12 @@ module.exports = {
         process.env.ROPSTEN_URL),
       network_id: 3
     },
+    rinkeby: {
+      provider: () => new HDWalletProvider(
+        process.env.MNEMONIC,
+        process.env.RINKEBY_URL),
+      network_id: 4
+    }
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port

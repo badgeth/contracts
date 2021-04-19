@@ -8,6 +8,7 @@
   "scripts": {
     "truffle-console": "./node_modules/.bin/truffle console",
     "truffle-console-ropsten": "./node_modules/.bin/truffle console --network ropsten",
+    "truffle-console-rinkeby": "./node_modules/.bin/truffle console --network rinkeby",
     "truffle-compile": "./node_modules/.bin/truffle compile",
     "truffle-compile!": "./node_modules/.bin/truffle compile --all",
     "truffle-migrate": "./node_modules/.bin/truffle migrate",
