@@ -9,4 +9,8 @@ library BadgethStructs {
         bool wasMinted;
     }
 
+    struct Badge {
+        int version;
+    }
+
 }
