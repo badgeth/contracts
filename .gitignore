@@ -1,5 +1,6 @@
-**/.DS_Store
-**/.env
-**/artifacts
-**/build
-**/node_modules
+node_modules
+.env
+
+#Hardhat files
+cache
+artifacts

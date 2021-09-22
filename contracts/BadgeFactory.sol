@@ -2,54 +2,39 @@
 
 pragma solidity ^0.8.0;
 
-import "./BadgeMinter.sol";
-import "./BadgeRecipientOracle.sol";
-import "./BadgeRecipientCuration.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "./Badge.sol";
 
+// research if it would be more gas efficient to check whitelisted addresses in Badge.sol
 
-contract BadgeFactory {
+contract BadgeFactory is Ownable {
 
-    event BadgeDefinitionCreated(string badgeName, string entity, string property, bool preAwardValue, bool postAwardValue);
+    // subgraphId => mapping(badgeName => erc721 address)
+    mapping (string => mapping (string => address)) public getBadge;
+    address[] public allBadges;
 
-    address public governance;
-    address public badgeRecipientOracle;
-    address public badgeRecipientCuration; // not implemented
+    function deployBadgeContract(
+        string memory subgraphId,
+        string memory badgeName,
+        string memory symbol
+    ) public onlyOwner {
 
-    string public queryURL;
+        require(getBadge[subgraphId][badgeName] == address(0), "Badge already exists");
 
-    constructor(string memory _queryURL) {
-        governance = msg.sender;
-        queryURL = _queryURL;
+        Badge badge = new Badge(subgraphId, badgeName, symbol);
+        getBadge[subgraphId][badgeName] = address(badge);
+        allBadges.push(address(badge));
     }
 
-    function setQueryURL(string memory queryURLString) public {
-        require (msg.sender == governance, "!governance");
+    function awardBadge(
+        string memory subgraphId,
+        string memory badgeName,
+        uint256 badgeNumber,
+        address winner
+    ) public onlyOwner {
 
-        queryURL = queryURLString;
+        require(getBadge[subgraphId][badgeName] != address(0), "Badge doesn't exist");
+        Badge badge = Badge(getBadge[subgraphId][badgeName]);
+        badge.awardBadge(badgeNumber, winner);
     }
-
-    function setBadgeRecipientOracle(address oracleAddress) public {
-        require (msg.sender == governance, "!governance");
-
-        badgeRecipientOracle = oracleAddress;
-    }
-
-    function setBadgeRecipientCuration(address curationAddress) public {
-        require (msg.sender == governance, "!governance");
-
-        badgeRecipientCuration = curationAddress;
-    }
-
-    function createBadgeDefinition(
-        string calldata badgeName,
-        string calldata entity,
-        string calldata property,
-        bool preAwardValue,
-        bool postAwardValue) public {
-            
-        require (msg.sender == governance, "!governance");
-
-        emit BadgeDefinitionCreated(badgeName, entity, property, preAwardValue, postAwardValue);
-    }
-
 }
