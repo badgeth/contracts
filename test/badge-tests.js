@@ -1,5 +1,4 @@
 const { expect } = require("chai");
-const { Contract } = require("ethers");
 const { ethers } = require("hardhat");
 
 const BADGE_DEPLOYMENT_SUBGRAPH_ID = "0x021c1a1ce318e7b4545f6280b248062592b71706";
