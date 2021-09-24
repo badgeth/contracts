@@ -10,12 +10,24 @@ const BADGE_CONTRACT_NAME = "Badge";
 const BADGE_FACTORY_CONTRACT_NAME = "BadgeFactory";
 
 describe("Badge Deployment", function () {
-  it("Should save subgraph id, badge name, and symbol", async function () {
+  it("Should save subgraphId-badgeName upon construction", async function () {
     let badge = await deployBadgeContract();
+    let expectedBadgeDefinitionId = BADGE_DEPLOYMENT_SUBGRAPH_ID + BADGE_DEPLOYMENT_NAME;
+    let actualBadgeDefinitionId = await badge.badgeDefinitionId();
+    expect(actualBadgeDefinitionId).to.equal(expectedBadgeDefinitionId);
+  });
 
-    expect(await badge.subgraphId()).to.equal(BADGE_DEPLOYMENT_SUBGRAPH_ID);
-    expect(await badge.name()).to.equal(BADGE_DEPLOYMENT_NAME);
-    expect(await badge.symbol()).to.equal(BADGE_DEPLOYMENT_SYMBOL);
+  it("Should generate tokenURIs in the format of {subgraphId}{badgeName}{tokenId}", async function () {
+    let badge = await deployBadgeContract();
+    let numberToTest = 10;
+    let expectedBaseURI = BADGE_DEPLOYMENT_SUBGRAPH_ID + BADGE_DEPLOYMENT_NAME;
+
+    await awardBadges(badge, numberToTest);
+    for(i=0;i<numberToTest;i++) {
+      let expectedTokenURI = expectedBaseURI + i;
+      let actualTokenURI = await badge.tokenURI(i);
+      expect(actualTokenURI).to.equal(expectedTokenURI);
+    }
   });
 
   it("Should increment winner's balance when the contract deployer awards winner a badge", async function () {
@@ -26,10 +38,9 @@ describe("Badge Deployment", function () {
     expect(afterBadgeCount).to.equal("2");
   });
 
-  it("Should facilitate minting of 1000 badges", async function () {
+  it("Should facilitate minting 1000 badges between 15 winners", async function () {
     let badge = await deployBadgeContract();
     const accounts = await hre.ethers.getSigners();
-    
     for (i=0;i<1000;i++) {
       await badge.awardBadge(i, accounts[i%10].address);
       // console.log("minting badge #" + i + " to " + accounts[i%15].address);
@@ -73,4 +84,10 @@ async function deployBadgeFactory() {
   const badgeFactory = await BadgeFactory.deploy();
   await badgeFactory.deployed();
   return badgeFactory;
+}
+
+async function awardBadges(badgeContract, numberToAward) {
+  for (i=0;i<numberToAward;i++) {
+    badgeContract.awardBadge(i, BADGE_WINNER_ACCOUNT);
+  }
 }

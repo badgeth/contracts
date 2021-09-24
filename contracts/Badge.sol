@@ -9,12 +9,15 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 contract Badge is ERC721, Ownable {
 
+    using Strings for uint256;
+
     struct BadgeMetadata {
         address winner;
         uint badgeId;
     }
 
-    string public subgraphId;
+    // subgraphId-badgeName
+    string public badgeDefinitionId;
 
     constructor(
         string memory subgraphId_,
@@ -22,7 +25,7 @@ contract Badge is ERC721, Ownable {
         string memory symbol_
     ) ERC721(name_, symbol_) {
 
-        subgraphId = subgraphId_;
+        badgeDefinitionId = string(abi.encodePacked(subgraphId_, name_));
     }
 
     function awardBadge(
@@ -40,5 +43,10 @@ contract Badge is ERC721, Ownable {
 
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721) returns (bool) {
         return super.supportsInterface(interfaceId);
+    }
+
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        require(_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+        return string(abi.encodePacked(badgeDefinitionId, tokenId.toString()));
     }
 }
