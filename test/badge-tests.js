@@ -1,4 +1,5 @@
 const { expect } = require("chai");
+const { Contract } = require("ethers");
 const { ethers } = require("hardhat");
 
 const BADGE_DEPLOYMENT_SUBGRAPH_ID = "0x021c1a1ce318e7b4545f6280b248062592b71706";
@@ -38,16 +39,16 @@ describe("Badge Deployment", function () {
     expect(afterBadgeCount).to.equal("2");
   });
 
-  it("Should facilitate minting 1000 badges between 15 winners", async function () {
-    let badge = await deployBadgeContract();
-    const accounts = await hre.ethers.getSigners();
-    for (i=0;i<1000;i++) {
-      await badge.awardBadge(i, accounts[i%10].address);
-      // console.log("minting badge #" + i + " to " + accounts[i%15].address);
-    }
-    let badgeBalance = (await badge.balanceOf(accounts[0].address)).toString();
-    expect(badgeBalance).to.equal("100");
-  });
+  // it("Should facilitate minting 1000 badges between 15 winners", async function () {
+  //   let badge = await deployBadgeContract();
+  //   const accounts = await hre.ethers.getSigners();
+  //   for (i=0;i<1000;i++) {
+  //     await badge.awardBadge(i, accounts[i%10].address);
+  //     // console.log("minting badge #" + i + " to " + accounts[i%15].address);
+  //   }
+  //   let badgeBalance = (await badge.balanceOf(accounts[0].address)).toString();
+  //   expect(badgeBalance).to.equal("100");
+  // });
 });
 
 describe("BadgeFactory Deployment", function () {
@@ -62,6 +63,37 @@ describe("BadgeFactory Deployment", function () {
 
     let badgeReference = await badgeFactory.getBadge(BADGE_DEPLOYMENT_SUBGRAPH_ID, BADGE_DEPLOYMENT_NAME);
     expect(badgeReference).to.not.equal(ethers.constants.AddressZero);
+  });
+
+  it("Should facilitate minting of badges", async function () {
+    const badgeFactory = await deployBadgeFactory();
+    const tokenIdToMint = 3;
+
+    await badgeFactory.deployBadgeContract(
+      BADGE_DEPLOYMENT_SUBGRAPH_ID,
+      BADGE_DEPLOYMENT_NAME,
+      BADGE_DEPLOYMENT_SYMBOL
+    );
+
+    // attach to the Badge contract our BadgeFactory just deployed
+    const badgeReference = await badgeFactory.getBadge(BADGE_DEPLOYMENT_SUBGRAPH_ID, BADGE_DEPLOYMENT_NAME);
+    const badgeContractFactory = await ethers.getContractFactory(BADGE_CONTRACT_NAME);
+    const badge = await badgeContractFactory.attach(badgeReference);
+
+    const balanceBeforeAward = await badge.balanceOf(BADGE_WINNER_ACCOUNT);
+
+    await badgeFactory.awardBadge(
+      BADGE_DEPLOYMENT_SUBGRAPH_ID,
+      BADGE_DEPLOYMENT_NAME,
+      tokenIdToMint,
+      BADGE_WINNER_ACCOUNT
+    );
+
+    const balanceAfterAward = await badge.balanceOf(BADGE_WINNER_ACCOUNT);
+    const ownerAfterAward = await badge.ownerOf(tokenIdToMint);
+
+    expect(balanceBeforeAward.toString()).to.equal((balanceAfterAward - 1).toString());
+    expect(ownerAfterAward).to.equal(BADGE_WINNER_ACCOUNT);
   });
 });
 
