@@ -9,7 +9,9 @@ module.exports = {
     },
     matic: {
       url: "https://rpc-mumbai.maticvigil.com",
-      accounts: [privateKey]
+      accounts: [privateKey],
+      gas: 5500000,
+      gasPrice: 7000000000
     }
   },
   solidity: {
