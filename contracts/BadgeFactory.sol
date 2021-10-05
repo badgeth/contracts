@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Badge.sol";
+import {BadgethStructs} from "./BadgethStructs.sol";
 
 // research if it would be more gas efficient to check whitelisted addresses in Badge.sol
 
@@ -29,12 +30,11 @@ contract BadgeFactory is Ownable {
     function awardBadge(
         string memory subgraphId,
         string memory badgeName,
-        uint256 badgeNumber,
-        address winner
+        BadgethStructs.BadgeMetadata memory badgeData
     ) public onlyOwner {
 
         require(getBadge[subgraphId][badgeName] != address(0), "Badge doesn't exist");
         Badge badge = Badge(getBadge[subgraphId][badgeName]);
-        badge.awardBadge(badgeNumber, winner);
+        badge.awardBadge(badgeData);
     }
 }
