@@ -5,6 +5,8 @@ require("hardhat-abi-exporter");
 
 const fs = require('fs');
 const privateKey = fs.readFileSync(".secret").toString().trim();
+const maticVigilKey = fs.readFileSync(".matic-vigil-key").toString().trim();
+
 module.exports = {
   // defaultNetwork: "matic",
   networks: {
@@ -17,7 +19,7 @@ module.exports = {
       gasPrice: 7000000000
     },
     matic: {
-      url: "https://rpc-mainnet.maticvigil.com/v1/91e04c9de653d3c2e1432728063200e097215465",
+      url: "https://rpc-mainnet.maticvigil.com/v1/" + maticVigilKey,
       accounts: [privateKey],
       gasPrice: 50000000000
     }
