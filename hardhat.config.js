@@ -1,5 +1,8 @@
 require("@nomiclabs/hardhat-ethers");
 require("hardhat-gas-reporter");
+require("hardhat-abi-exporter");
+
+
 const fs = require('fs');
 const privateKey = fs.readFileSync(".secret").toString().trim();
 module.exports = {
@@ -7,11 +10,16 @@ module.exports = {
   networks: {
     hardhat: {
     },
-    matic: {
+    mumbai: {
       url: "https://rpc-mumbai.maticvigil.com",
       accounts: [privateKey],
       gas: 5500000,
       gasPrice: 7000000000
+    },
+    matic: {
+      url: "https://rpc-mainnet.maticvigil.com/v1/91e04c9de653d3c2e1432728063200e097215465",
+      accounts: [privateKey],
+      gasPrice: 50000000000
     }
   },
   solidity: {
@@ -34,5 +42,12 @@ module.exports = {
   },
   gasReporter: {
     enabled: true
+  },
+  abiExporter: {
+    path: './data/abi',
+    clear: true,
+    flat: true,
+    spacing: 2,
+    pretty: false
   }
 }
