@@ -3,19 +3,21 @@
 const { ethers } = require("hardhat");
 
 const BADGE_DEPLOYMENT_SUBGRAPH_ID = "0x021c1a1ce318e7b4545f6280b248062592b71706";
-const BADGE_WINNER_ACCOUNT = "0x7d0277Baa5037dE6749B4c0Ff44Adf6EBcBd31D8";
 const BADGE_DEPLOYMENT_NAME = "The Original ZeNFT";
 const BADGE_DEPLOYMENT_SYMBOL = "ZEN";
-const BADGE_URI_3 = "ipfs://QmX2FBuDQKSsspXEq7uJbeyDnCKq9Bc16AQ8zX3YQXGbMt";
 
 const BADGE_CONTRACT_NAME = "Badge";
 const BADGE_FACTORY_CONTRACT_NAME = "BadgeFactory";
 
 
+const BADGE_STRUCT = {
+  winner: "0x7d0277Baa5037dE6749B4c0Ff44Adf6EBcBd31D8",
+  badgeId: 1,
+  tokenURI: "ipfs://QmXdQXhk6jKRWwHizV6YtVqTUMNgQqGmHJF5sG6od4kWCc"
+}
 
 async function main() {
   const badgeFactoryContract = await deployBadgeFactory();
-  const tokenIdToMint = 3;
 
   await badgeFactoryContract.deployBadgeContract(
     BADGE_DEPLOYMENT_SUBGRAPH_ID,
@@ -26,8 +28,7 @@ async function main() {
   await badgeFactoryContract.awardBadge(
     BADGE_DEPLOYMENT_SUBGRAPH_ID,
     BADGE_DEPLOYMENT_NAME,
-    tokenIdToMint,
-    BADGE_WINNER_ACCOUNT
+    BADGE_STRUCT
   );
 
   const badgeAddress = await badgeFactoryContract.getBadge(BADGE_DEPLOYMENT_SUBGRAPH_ID, BADGE_DEPLOYMENT_NAME);
@@ -35,8 +36,8 @@ async function main() {
 
   const badgeContractFactory = await ethers.getContractFactory(BADGE_CONTRACT_NAME);
   const badgeContract = await badgeContractFactory.attach(badgeAddress);
-  const balance = await badgeContract.balanceOf(BADGE_WINNER_ACCOUNT);
-  console.log("Balance of " + BADGE_WINNER_ACCOUNT + " is " + balance);
+  const balance = await badgeContract.balanceOf(BADGE_STRUCT.winner);
+  console.log("Balance of " + BADGE_STRUCT.winner + " is " + balance);
 
   console.log("Badge minting complete");
 }
