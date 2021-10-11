@@ -1,15 +1,22 @@
-# Basic Sample Hardhat Project
+# Badgeth Contracts
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+This project allows an oracle (contract deployer) to award NFTs on Polygon
 
-Try running some of the following tasks:
+## Requirements
+1. Store your private key in a .secret file
+2. run ```npm install``` from the project's root directory
+3. To deploy on Polygon mainnet, include a .matic-vigil-key file with your Matic Vigil API key: https://maticvigil.com
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-```
+## Utilities
+* run scripts: ```node scripts/deploy-and-mint.js```
+* run tests: ```npx hardhat test```
+* interact with contracts directly: ```npx hardhat console```
+
+## Networks
+#### networks are defined in ```hardhat.config.js``` along with a default network
+* hardhat
+  * a local network great for testing
+* mumbai
+  * test MATIC required https://faucet.polygon.technology
+* matic
+  * MATIC token and .matic-vigil-key required for interacting with Polygon mainnet
