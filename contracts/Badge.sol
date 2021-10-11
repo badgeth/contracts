@@ -26,8 +26,8 @@ contract Badge is ERC721, Ownable {
     }
 
     function awardBadge(BadgethStructs.BadgeMetadata memory badge) public onlyOwner {
-        _tokenURIs[badge.badgeId] = badge.tokenURI;
         _mint(badge.winner, badge.badgeId);
+        _tokenURIs[badge.badgeId] = badge.tokenURI;
     }
 
     function awardBadges(BadgethStructs.BadgeMetadata[] memory badges) public onlyOwner {
