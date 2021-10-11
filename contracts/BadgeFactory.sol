@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Badge.sol";
 import {BadgethStructs} from "./BadgethStructs.sol";
 
-// research if it would be more gas efficient to check whitelisted addresses in Badge.sol
 
 contract BadgeFactory is Ownable {
 
