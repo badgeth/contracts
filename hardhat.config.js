@@ -19,7 +19,7 @@ module.exports = {
       gasPrice: 7000000000
     },
     matic: {
-      // url: "https://rpc-mainnet.maticvigil.com/v1/" + maticVigilKey,
+      url: "https://rpc-mainnet.maticvigil.com/v1/",// + maticVigilKey,
       accounts: [privateKey],
       gasPrice: 50000000000
     }
