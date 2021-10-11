@@ -2,6 +2,13 @@
 
 This project allows an oracle (contract deployer) to award NFTs on Polygon
 
+## Features
+* BadgeFactory contract deploys Badge contracts for owner
+* BadgeFactory contract awards badges specified by owner
+* BadgeFactory contract allows whitelisted addresses to burn badges
+* BadgeFactory contract allows whitelisted addresses to revoke their privileges
+
+
 ## Requirements
 1. Store your private key in a .secret file
 2. run ```npm install``` from the project's root directory
