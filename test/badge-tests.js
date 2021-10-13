@@ -1,4 +1,5 @@
 const { expect } = require("chai");
+const { keccak256, formatBytes32String, solidityKeccak256 } = require("ethers/lib/utils");
 const { ethers } = require("hardhat");
 
 const BADGE_DEPLOYMENT_SUBGRAPH_ID = "0x021c1a1ce318e7b4545f6280b248062592b71706";
@@ -7,6 +8,9 @@ const BADGE_DEPLOYMENT_SYMBOL = "TBB";
 
 const BADGE_CONTRACT_NAME = "Badge";
 const BADGE_FACTORY_CONTRACT_NAME = "BadgeFactory";
+
+const BADGETH_MINTER_ROLE = solidityKeccak256(["string"], ["MINTER_ROLE"]);
+
 
 const BADGE_STRUCT = {
   winner: "0x0AE0C235C1E04eF85b3954186a3be6786cEef9b4",
@@ -26,7 +30,7 @@ describe("Badge Deployment", function () {
     const badge = await deployBadgeContract();
     const expectedTokenURI = BADGE_STRUCT.tokenURI;
 
-    await awardBadge(badge, BADGE_STRUCT);
+    await badge.awardBadge(BADGE_STRUCT);
     const actualTokenURI = await badge.tokenURI(BADGE_STRUCT.badgeId);
     expect(actualTokenURI).to.equal(expectedTokenURI);
   });
@@ -74,29 +78,38 @@ describe("BadgeFactory Deployment", function () {
   });
 
   it("Should facilitate minting of badges", async function () {
-    const badgeFactory = await deployBadgeFactory();
+    const badgeFactoryContract = await deployBadgeFactory();
 
-    await badgeFactory.deployBadgeContract(
+    await badgeFactoryContract.deployBadgeContract(
       BADGE_DEPLOYMENT_SUBGRAPH_ID,
       BADGE_DEPLOYMENT_NAME,
       BADGE_DEPLOYMENT_SYMBOL
     );
 
+    const accounts = await hre.ethers.getSigners();
+    await badgeFactoryContract.transferBadgeAdminRole(
+      BADGE_DEPLOYMENT_SUBGRAPH_ID,
+      BADGE_DEPLOYMENT_NAME,
+      accounts[0].address
+    )
+
+
     // attach to the Badge contract our BadgeFactory just deployed
-    const badgeReference = await badgeFactory.getBadge(BADGE_DEPLOYMENT_SUBGRAPH_ID, BADGE_DEPLOYMENT_NAME);
+    const badgeReference = await badgeFactoryContract.getBadge(BADGE_DEPLOYMENT_SUBGRAPH_ID, BADGE_DEPLOYMENT_NAME);
     const badgeContractFactory = await ethers.getContractFactory(BADGE_CONTRACT_NAME);
-    const badge = await badgeContractFactory.attach(badgeReference);
+    const badgeContract = await badgeContractFactory.attach(badgeReference);
+    await badgeContract.grantRole(BADGETH_MINTER_ROLE, badgeFactoryContract.address)
 
-    const balanceBeforeAward = await badge.balanceOf(BADGE_STRUCT.winner);
+    const balanceBeforeAward = await badgeContract.balanceOf(BADGE_STRUCT.winner);
 
-    await badgeFactory.awardBadge(
+    await badgeFactoryContract.awardBadge(
       BADGE_DEPLOYMENT_SUBGRAPH_ID, 
       BADGE_DEPLOYMENT_NAME, 
       BADGE_STRUCT
     );
 
-    const balanceAfterAward = await badge.balanceOf(BADGE_STRUCT.winner);
-    const ownerAfterAward = await badge.ownerOf(BADGE_STRUCT.badgeId);
+    const balanceAfterAward = await badgeContract.balanceOf(BADGE_STRUCT.winner);
+    const ownerAfterAward = await badgeContract.ownerOf(BADGE_STRUCT.badgeId);
 
     expect(balanceBeforeAward.toString()).to.equal((balanceAfterAward - 1).toString());
     expect(ownerAfterAward).to.equal(BADGE_STRUCT.winner);
@@ -114,6 +127,8 @@ async function deployBadgeContract() {
     BADGE_DEPLOYMENT_SYMBOL
   );
   await badge.deployed();
+  const accounts = await hre.ethers.getSigners();
+  await badge.grantRole(BADGETH_MINTER_ROLE, accounts[0].address);
   return badge;
 }
 
@@ -122,12 +137,4 @@ async function deployBadgeFactory() {
   const badgeFactory = await BadgeFactory.deploy();
   await badgeFactory.deployed();
   return badgeFactory;
-}
-
-async function awardBadge(badgeContract, badgeStruct) {
-  badgeContract.awardBadge(badgeStruct);
-}
-
-async function awardBadges(badgeContract, badgeStructs) {
-  badgeStructs.forEach(badgeStruct => awardBadge(badgeContract, badgeStruct));
 }

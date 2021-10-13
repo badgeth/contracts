@@ -2,22 +2,26 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./Badge.sol";
-import {BadgethStructs} from "./BadgethStructs.sol";
+import {BadgethLibrary} from "./BadgethLibrary.sol";
 
 
-contract BadgeFactory is Ownable {
+contract BadgeFactory is AccessControl {
 
     // subgraphId => mapping(badgeName => erc721 address)
     mapping (string => mapping (string => address)) public getBadge;
     address[] public allBadges;
 
+    constructor() {
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
+
     function deployBadgeContract(
         string memory subgraphId,
         string memory badgeName,
         string memory symbol
-    ) public onlyOwner {
+    ) public {
 
         require(getBadge[subgraphId][badgeName] == address(0), "Badge already exists");
 
@@ -29,11 +33,25 @@ contract BadgeFactory is Ownable {
     function awardBadge(
         string memory subgraphId,
         string memory badgeName,
-        BadgethStructs.BadgeMetadata memory badgeData
-    ) public onlyOwner {
+        BadgethLibrary.BadgeMetadata memory badgeData
+    ) public {
 
         require(getBadge[subgraphId][badgeName] != address(0), "Badge doesn't exist");
+        
         Badge badge = Badge(getBadge[subgraphId][badgeName]);
         badge.awardBadge(badgeData);
+    }
+
+    function transferBadgeAdminRole(
+        string memory subgraphId,
+        string memory badgeName,
+        address admin
+    ) public {
+        
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Caller is not BadgeFactory admin");
+
+        Badge badge = Badge(getBadge[subgraphId][badgeName]);
+        badge.grantRole(DEFAULT_ADMIN_ROLE, admin);
+        badge.revokeRole(DEFAULT_ADMIN_ROLE, address(this));
     }
 }
