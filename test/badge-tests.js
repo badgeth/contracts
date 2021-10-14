@@ -49,19 +49,25 @@ describe("Badge Deployment", function () {
     expect(afterBadgeCount).to.equal(numberToTest.toString());
   });
 
-  it("Should allow contract deployer to award and burn a badge", async function () {
+  it("Should allow contract deployer to award and burn badges in batches", async function () {
     const account = await mainAccount();
     const badge = await deployBadgeContract();
     await badge.grantRole(BADGETH_BURNER_ROLE, account.address)
-    await badge.awardBadge(BADGE_STRUCT);
-    const balanceBeforeBurn = await badge.balanceOf(BADGE_STRUCT.winner);
-    await badge.burnBadge(BADGE_STRUCT.badgeId);
-    const balanceAfterBurn = await badge.balanceOf(BADGE_STRUCT.winner);
-    
-    console.log("balance before burn: " + balanceBeforeBurn);
-    console.log("balance after burn: " + balanceAfterBurn);
 
-    const badgeBurnSuccess = (balanceBeforeBurn == 1) && (balanceAfterBurn == 0);
+    const badgeIds = [3, 1, 5, 22, 44, 35];
+    let badgeStructs = badgeStructsFromIds(badgeIds);
+
+    console.log(badgeStructs);
+
+    await badge.awardBadges(badgeStructs);
+
+    // get balance before and after burn
+    const balanceBeforeBurn = await badge.balanceOf(BADGE_STRUCT.winner);
+    await badge.burnBadges(badgeIds);
+    const balanceAfterBurn = await badge.balanceOf(BADGE_STRUCT.winner);
+
+    const badgeBurnSuccess = (balanceBeforeBurn == badgeIds.length) && (balanceAfterBurn == 0);
+    
     expect(badgeBurnSuccess).to.equal(true); 
   });
 });
@@ -145,4 +151,20 @@ async function deployBadgeFactory() {
 async function mainAccount() {
   const accounts = await hre.ethers.getSigners();
   return accounts[0];
+}
+
+function badgeStructWithUniqueId(badgeId) {
+  return {
+    winner: BADGE_STRUCT.winner,
+    badgeId: badgeId,
+    tokenURI: BADGE_STRUCT.tokenURI
+  };
+}
+
+function badgeStructsFromIds(badgeIds) {
+  let badgeStructs = [];
+  badgeIds.forEach(id => {
+    badgeStructs.push(badgeStructWithUniqueId(id))
+  });
+  return badgeStructs;
 }
