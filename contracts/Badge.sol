@@ -27,6 +27,9 @@ contract Badge is ERC721, AccessControl {
         badgeDefinitionId = string(abi.encodePacked(subgraphId_, name_));
     }
 
+
+    ////// AWARD BADGES //////
+
     function awardBadge(BadgethLibrary.BadgeMetadata memory badge) public {
         require(hasRole(BadgethLibrary.MINTER_ROLE, msg.sender), "Caller is not a minter");
         _awardBadge(badge);
@@ -43,6 +46,26 @@ contract Badge is ERC721, AccessControl {
     function _awardBadge(BadgethLibrary.BadgeMetadata memory badge) private {
         _mint(badge.winner, badge.badgeId);
         _tokenURIs[badge.badgeId] = badge.tokenURI;
+    }
+
+    ////// BURN BADGES //////
+
+    function burnBadge(uint256 badgeId) public {
+        require(hasRole(BadgethLibrary.BURNER_ROLE, msg.sender), "Caller is not a burner");
+        _burnBadge(badgeId);
+    }
+
+    function burnBadges(uint[] memory badgeIDs) public {
+        require(hasRole(BadgethLibrary.BURNER_ROLE, msg.sender), "Caller is not a burner");
+        
+        for (uint i=0; i<badgeIDs.length; i++) {
+            _burnBadge(badgeIDs[i]);
+        }
+    }
+
+    function _burnBadge(uint256 badgeId) private {
+        _burn(badgeId);
+        _tokenURIs[badgeId] = "";
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, AccessControl) returns (bool) {

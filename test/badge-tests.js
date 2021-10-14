@@ -10,6 +10,7 @@ const BADGE_CONTRACT_NAME = "Badge";
 const BADGE_FACTORY_CONTRACT_NAME = "BadgeFactory";
 
 const BADGETH_MINTER_ROLE = solidityKeccak256(["string"], ["MINTER_ROLE"]);
+const BADGETH_BURNER_ROLE = solidityKeccak256(["string"], ["BURNER_ROLE"]);
 
 
 const BADGE_STRUCT = {
@@ -48,18 +49,20 @@ describe("Badge Deployment", function () {
     expect(afterBadgeCount).to.equal(numberToTest.toString());
   });
 
-  it("Should facilitate minting 1000 badges between 10 winners", async function () {
-    let badge = await deployBadgeContract();
-    const accounts = await hre.ethers.getSigners();
-    for (i=0;i<1000;i++) {
-      let badgeData = BADGE_STRUCT;
-      badgeData.winner = accounts[i%10].address.toString();
-      badgeData.badgeId = i;
-      await badge.awardBadge(badgeData);
-      // console.log("minting badge #" + i + " to " + accounts[i%15].address);
-    }
-    let badgeBalance = (await badge.balanceOf(accounts[0].address)).toString();
-    expect(badgeBalance).to.equal("100");
+  it("Should allow contract deployer to award and burn a badge", async function () {
+    const account = await mainAccount();
+    const badge = await deployBadgeContract();
+    await badge.grantRole(BADGETH_BURNER_ROLE, account.address)
+    await badge.awardBadge(BADGE_STRUCT);
+    const balanceBeforeBurn = await badge.balanceOf(BADGE_STRUCT.winner);
+    await badge.burnBadge(BADGE_STRUCT.badgeId);
+    const balanceAfterBurn = await badge.balanceOf(BADGE_STRUCT.winner);
+    
+    console.log("balance before burn: " + balanceBeforeBurn);
+    console.log("balance after burn: " + balanceAfterBurn);
+
+    const badgeBurnSuccess = (balanceBeforeBurn == 1) && (balanceAfterBurn == 0);
+    expect(badgeBurnSuccess).to.equal(true); 
   });
 });
 
@@ -86,11 +89,11 @@ describe("BadgeFactory Deployment", function () {
       BADGE_DEPLOYMENT_SYMBOL
     );
 
-    const accounts = await hre.ethers.getSigners();
+    const account = await mainAccount();
     await badgeFactoryContract.transferBadgeAdminRole(
       BADGE_DEPLOYMENT_SUBGRAPH_ID,
       BADGE_DEPLOYMENT_NAME,
-      accounts[0].address
+      account.address
     )
 
 
@@ -127,8 +130,8 @@ async function deployBadgeContract() {
     BADGE_DEPLOYMENT_SYMBOL
   );
   await badge.deployed();
-  const accounts = await hre.ethers.getSigners();
-  await badge.grantRole(BADGETH_MINTER_ROLE, accounts[0].address);
+  const account = await mainAccount();
+  await badge.grantRole(BADGETH_MINTER_ROLE, account.address);
   return badge;
 }
 
@@ -137,4 +140,9 @@ async function deployBadgeFactory() {
   const badgeFactory = await BadgeFactory.deploy();
   await badgeFactory.deployed();
   return badgeFactory;
+}
+
+async function mainAccount() {
+  const accounts = await hre.ethers.getSigners();
+  return accounts[0];
 }
