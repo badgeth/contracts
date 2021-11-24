@@ -2,7 +2,6 @@
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.2",
     "hardhat": "^2.6.4",
-    "hardhat-abi-exporter": "^2.3.0",
     "hardhat-gas-reporter": "^1.0.4"
   },
   "devDependencies": {

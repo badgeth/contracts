@@ -1,6 +1,5 @@
 require("@nomiclabs/hardhat-ethers");
 require("hardhat-gas-reporter");
-require("hardhat-abi-exporter");
 
 
 const fs = require('fs');
@@ -44,12 +43,5 @@ module.exports = {
   },
   gasReporter: {
     enabled: true
-  },
-  abiExporter: {
-    path: './data/abi',
-    clear: true,
-    flat: true,
-    spacing: 2,
-    pretty: false
   }
 }
