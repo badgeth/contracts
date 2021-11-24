@@ -5,18 +5,21 @@ const { ethers } = require("hardhat");
 const BADGE_DEPLOYMENT_SUBGRAPH_ID = "0x021c1a1ce318e7b4545f6280b248062592b71706";
 const BADGE_DEPLOYMENT_NAME = "The Best Badger";
 const BADGE_DEPLOYMENT_SYMBOL = "TBB";
+const BADGE_ORACLE_MERKLE_ROOT = "0x9d20058fab9076448c912b12aa20670af090f5c6bf6ce112274ebafb854a8605";
+
 
 const BADGE_CONTRACT_NAME = "Badge";
 const BADGE_FACTORY_CONTRACT_NAME = "BadgeFactory";
 
 const BADGETH_MINTER_ROLE = solidityKeccak256(["string"], ["MINTER_ROLE"]);
 const BADGETH_BURNER_ROLE = solidityKeccak256(["string"], ["BURNER_ROLE"]);
+const BADGETH_ORACLE_ROLE = solidityKeccak256(["string"], ["ORACLE_ROLE"]);
 
 
 const BADGE_STRUCT = {
   winner: "0x0AE0C235C1E04eF85b3954186a3be6786cEef9b4",
   badgeId: 3,
-  tokenURI: "ipfs://QmX2FBuDQKSsspXEq7uJbeyDnCKq9Bc16AQ8zX3YQXGbMt"
+  badgeDefinitionId: "{subgraphDeploymentId-Delegation_Nation}"
 }
 
 describe("Badge Deployment", function () {
@@ -29,7 +32,7 @@ describe("Badge Deployment", function () {
 
   it("Should save tokenURI of badge when it is minted", async function () {
     const badge = await deployBadgeContract();
-    const expectedTokenURI = BADGE_STRUCT.tokenURI;
+    const expectedTokenURI = BADGE_STRUCT.badgeDefinitionId;
 
     await badge.awardBadge(BADGE_STRUCT);
     const actualTokenURI = await badge.tokenURI(BADGE_STRUCT.badgeId);
@@ -123,6 +126,16 @@ describe("BadgeFactory Deployment", function () {
     expect(balanceBeforeAward.toString()).to.equal((balanceAfterAward - 1).toString());
     expect(ownerAfterAward).to.equal(BADGE_STRUCT.winner);
   });
+
+  it("Should allow users with ORACLE_ROLE privileges to update the merkle root", async function () {
+    const badgeContract = await deployBadgeContract();
+    const account = await mainAccount();
+    await badgeContract.grantRole(BADGETH_ORACLE_ROLE, account.address);
+    await badgeContract.updateMerkleRoot(BADGE_ORACLE_MERKLE_ROOT);
+    const merkleRoot = await badgeContract.getMerkleRoot();
+
+    expect(merkleRoot).to.equal(BADGE_ORACLE_MERKLE_ROOT);
+  });
 });
 
 
@@ -157,7 +170,7 @@ function badgeStructWithUniqueId(badgeId) {
   return {
     winner: BADGE_STRUCT.winner,
     badgeId: badgeId,
-    tokenURI: BADGE_STRUCT.tokenURI
+    badgeDefinitionId: BADGE_STRUCT.badgeDefinitionId
   };
 }
 

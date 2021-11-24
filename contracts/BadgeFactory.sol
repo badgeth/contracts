@@ -21,10 +21,12 @@ contract BadgeFactory is AccessControl {
         string memory subgraphId,
         string memory badgeName,
         string memory symbol
+        // address oracle
     ) public {
 
         require(getBadge[subgraphId][badgeName] == address(0), "Badge already exists");
 
+        // Badge badge = new Badge(subgraphId, badgeName, symbol, oracle);
         Badge badge = new Badge(subgraphId, badgeName, symbol);
         getBadge[subgraphId][badgeName] = address(badge);
         allBadges.push(address(badge));

@@ -9,7 +9,7 @@ const BADGETH_LIBRARY_CONTRACT_NAME = "BadgethLibrary";
 const BADGE_STRUCT = {
   winner: "0x0AE0C235C1E04eF85b3954186a3be6786cEef9b4",
   badgeId: 3,
-  tokenURI: "ipfs://QmX2FBuDQKSsspXEq7uJbeyDnCKq9Bc16AQ8zX3YQXGbMt"
+  badgeDefinitionId: "{subgraphDeploymentId-Delegation_Nation}"
 }
 
 describe("BadgethLibrary", function () {
@@ -25,7 +25,7 @@ describe("BadgethLibrary", function () {
 function hashBadge(badgeStruct) {
   return ethers.utils.solidityKeccak256(
     ['address', 'uint16', 'string'],
-    [badgeStruct.winner, badgeStruct.badgeId, badgeStruct.tokenURI],
+    [badgeStruct.winner, badgeStruct.badgeId, badgeStruct.badgeDefinitionId],
   );
 }
 

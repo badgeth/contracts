@@ -10,12 +10,12 @@ import {BadgethLibrary} from "./BadgethLibrary.sol";
 
 contract Badge is ERC721, AccessControl {
 
-
     using Strings for uint256;
 
     // subgraphId-badgeName
     string public badgeDefinitionId;
     mapping (uint256 => string) private _tokenURIs;
+    bytes32 private _merkleRoot;
 
     constructor(
         string memory subgraphId_,
@@ -31,13 +31,11 @@ contract Badge is ERC721, AccessControl {
     ////// AWARD BADGES //////
 
     function awardBadge(BadgethLibrary.BadgeMetadata memory badge) public {
-        require(hasRole(BadgethLibrary.MINTER_ROLE, msg.sender), "Caller is not a minter");
+        // todo: verify badge with BadgethLibrary.verify()
         _awardBadge(badge);
     }
 
     function awardBadges(BadgethLibrary.BadgeMetadata[] memory badges) public {
-        require(hasRole(BadgethLibrary.MINTER_ROLE, msg.sender), "Caller is not a minter");
-
         for (uint i=0; i<badges.length; i++) {
             _awardBadge(badges[i]);
         }
@@ -45,7 +43,7 @@ contract Badge is ERC721, AccessControl {
 
     function _awardBadge(BadgethLibrary.BadgeMetadata memory badge) private {
         _mint(badge.winner, badge.badgeId);
-        _tokenURIs[badge.badgeId] = badge.tokenURI;
+        _tokenURIs[badge.badgeId] = badge.badgeDefinitionId;
     }
 
     ////// BURN BADGES //////
@@ -67,6 +65,18 @@ contract Badge is ERC721, AccessControl {
         _burn(badgeId);
         _tokenURIs[badgeId] = "";
     }
+
+    ////// Merkle //////
+
+    function updateMerkleRoot(bytes32 root) public {
+        require(hasRole(BadgethLibrary.ORACLE_ROLE, msg.sender), "Caller is not an oracle");
+        _merkleRoot = root;
+    }
+
+    function getMerkleRoot() public view returns (bytes32) {
+        return _merkleRoot;
+    }
+
 
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
