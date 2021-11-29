@@ -31,7 +31,16 @@ contract Badge is ERC721, AccessControl {
     ////// AWARD BADGES //////
 
     function awardBadge(BadgethLibrary.BadgeMetadata memory badge) public {
-        // todo: verify badge with BadgethLibrary.verify()
+        // todo: restrict to minters
+        _awardBadge(badge);
+    }
+
+    function awardBadgeWithProof(
+        BadgethLibrary.BadgeMetadata memory badge,
+        bytes32[] memory merkleProof,
+        bytes32 merkleRoot
+    ) public {
+        require(BadgethLibrary.verify(badge, merkleProof, merkleRoot) == true, 'invalid merkle proof');
         _awardBadge(badge);
     }
 
@@ -42,8 +51,8 @@ contract Badge is ERC721, AccessControl {
     }
 
     function _awardBadge(BadgethLibrary.BadgeMetadata memory badge) private {
-        _mint(badge.winner, badge.badgeId);
-        _tokenURIs[badge.badgeId] = badge.badgeDefinitionId;
+        _mint(badge.winner, badge.globalBadgeNumber);
+        _tokenURIs[badge.globalBadgeNumber] = badge.badgeDefinitionId;
     }
 
     ////// BURN BADGES //////

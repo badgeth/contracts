@@ -2,7 +2,8 @@
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.2",
     "hardhat": "^2.6.4",
-    "hardhat-gas-reporter": "^1.0.4"
+    "hardhat-gas-reporter": "^1.0.4",
+    "merkle-badges": "^1.0.4"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
