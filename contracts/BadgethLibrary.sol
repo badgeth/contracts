@@ -5,10 +5,10 @@ import "hardhat/console.sol";
 pragma solidity ^0.8.0;
 
 library BadgethLibrary {
+
   struct BadgeMetadata {
     address winner;
-    uint16 globalBadgeNumber;
-    string badgeDefinitionId;
+    uint8 badgeDefinitionNumber;
   }
 
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -18,45 +18,49 @@ library BadgethLibrary {
   function verify(
     BadgeMetadata memory badgeData,
     bytes32[] memory merkleProof,
+    uint256[] memory positions,
     bytes32 merkleRoot
-  ) public pure returns (bool) {
+  ) public view returns (bool) {
 
-    return BadgethMerkleProof.verify(merkleProof, merkleRoot, hashBadge(badgeData));
+    return BadgethMerkleProof.verify(merkleProof, positions, merkleRoot, hashBadge(badgeData));
   }
 
-  function hashBadge(BadgeMetadata memory badgeData) public pure returns (bytes32) {
-    return keccak256(abi.encodePacked(badgeData.winner, badgeData.globalBadgeNumber, badgeData.badgeDefinitionId));
+  function hashBadge(BadgeMetadata memory badgeData) public view returns (bytes32) {
+    return keccak256(abi.encodePacked(badgeData.winner, badgeData.badgeDefinitionNumber));
   }
 }
 
 /**
  * BadgethMerkleProof is identical to OpenZeppelin's MerkleProof library with the 
- * only exception being the replacement of keccak256 with sha256. 
+ * addition of a positions array to avoid sorting
  */ 
 library BadgethMerkleProof {
     /**
      * @dev Returns true if a `leaf` can be proved to be a part of a Merkle tree
      * defined by `root`. For this, a `proof` must be provided, containing
-     * sibling hashes on the branch from the leaf to the root of the tree. Each
-     * pair of leaves and each pair of pre-images are assumed to be sorted.
+     * sibling hashes on the branch from the leaf to the root of the tree. The
+     * positions parameter defines sorting.
      */
     function verify(
         bytes32[] memory proof,
+        uint256[] memory positions,
         bytes32 root,
         bytes32 leaf
-    ) internal pure returns (bool) {
+    ) internal view returns (bool) {
         bytes32 computedHash = leaf;
 
         for (uint256 i = 0; i < proof.length; i++) {
             bytes32 proofElement = proof[i];
 
-            if (computedHash <= proofElement) {
+            if (positions[i] == 1) {
                 // Hash(current computed hash + current element of the proof)
-                computedHash = sha256(abi.encodePacked(computedHash, proofElement));
+                computedHash = keccak256(abi.encodePacked(computedHash, proofElement));
             } else {
                 // Hash(current element of the proof + current computed hash)
-                computedHash = sha256(abi.encodePacked(proofElement, computedHash));
+                computedHash = keccak256(abi.encodePacked(proofElement, computedHash));
             }
+          // console.log("%s", i);
+          // console.logBytes32(computedHash);
         }
 
         // Check if the computed hash (root) is equal to the provided root
