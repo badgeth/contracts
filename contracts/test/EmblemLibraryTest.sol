@@ -2,21 +2,21 @@
 
 pragma solidity ^0.8.0;
 
-import {BadgethLibrary} from "../BadgethLibrary.sol";
+import {EmblemLibrary} from "../EmblemLibrary.sol";
 
-contract BadgethLibraryTest {
-  function hashBadge(BadgethLibrary.BadgeMetadata memory badgeData) public view returns (bytes32) {
-    return BadgethLibrary.hashBadge(badgeData);
+contract EmblemLibraryTest {
+  function hashBadge(EmblemLibrary.BadgeStruct memory badgeStruct) public view returns (bytes32) {
+    return EmblemLibrary.hashBadge(badgeStruct);
   }
 
   function verifyBadge(
-    BadgethLibrary.BadgeMetadata calldata badgeData,
+    EmblemLibrary.BadgeStruct calldata badgeStruct,
     bytes32[] memory merkleProof,
     uint256[] memory positions,
     bytes32 merkleRoot
   ) public view returns (bool) {
     
-    return BadgethLibrary.verify(badgeData, merkleProof, positions, merkleRoot);
+    return EmblemLibrary.verify(badgeStruct, merkleProof, positions, merkleRoot);
   }
 
   function hashBytes(bytes32[] memory bytesArray) public view returns (bytes32) {

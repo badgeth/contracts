@@ -4,9 +4,9 @@ import "hardhat/console.sol";
 
 pragma solidity ^0.8.0;
 
-library BadgethLibrary {
+library EmblemLibrary {
 
-  struct BadgeMetadata {
+  struct BadgeStruct {
     address winner;
     uint8 badgeDefinitionNumber;
   }
@@ -16,17 +16,17 @@ library BadgethLibrary {
   bytes32 public constant ORACLE_ROLE = keccak256("ORACLE_ROLE");
 
   function verify(
-    BadgeMetadata memory badgeData,
+    BadgeStruct memory badgeStruct,
     bytes32[] memory merkleProof,
     uint256[] memory positions,
     bytes32 merkleRoot
   ) public view returns (bool) {
 
-    return BadgethMerkleProof.verify(merkleProof, positions, merkleRoot, hashBadge(badgeData));
+    return EmblemMerkleProof.verify(merkleProof, positions, merkleRoot, hashBadge(badgeStruct));
   }
 
-  function hashBadge(BadgeMetadata memory badgeData) public view returns (bytes32) {
-    return keccak256(abi.encodePacked(badgeData.winner, badgeData.badgeDefinitionNumber));
+  function hashBadge(BadgeStruct memory badgeStruct) public view returns (bytes32) {
+    return keccak256(abi.encodePacked(badgeStruct.winner, badgeStruct.badgeDefinitionNumber));
   }
 }
 
@@ -34,7 +34,7 @@ library BadgethLibrary {
  * BadgethMerkleProof is identical to OpenZeppelin's MerkleProof library with the 
  * addition of a positions array to avoid sorting
  */ 
-library BadgethMerkleProof {
+library EmblemMerkleProof {
     /**
      * @dev Returns true if a `leaf` can be proved to be a part of a Merkle tree
      * defined by `root`. For this, a `proof` must be provided, containing
