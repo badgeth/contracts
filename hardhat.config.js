@@ -1,10 +1,11 @@
 require("@nomiclabs/hardhat-ethers");
 require("hardhat-gas-reporter");
+require("hardhat-abi-exporter");
 
 
 const fs = require('fs');
 const privateKey = fs.readFileSync(".secret").toString().trim();
-// const maticVigilKey = fs.readFileSync(".matic-vigil-key").toString().trim();
+const maticVigilKey = fs.readFileSync(".matic-vigil-key").toString().trim();
 
 module.exports = {
   // defaultNetwork: "matic",
@@ -43,5 +44,14 @@ module.exports = {
   },
   gasReporter: {
     enabled: true
+  },
+  abiExporter: {
+    path: './data/abi',
+    runOnCompile: true,
+    clear: true,
+    flat: true,
+    only: [],
+    spacing: 2,
+    pretty: true,
   }
 }

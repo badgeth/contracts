@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 pragma solidity ^0.8.0;
 
@@ -59,8 +59,6 @@ library EmblemMerkleProof {
                 // Hash(current element of the proof + current computed hash)
                 computedHash = keccak256(abi.encodePacked(proofElement, computedHash));
             }
-          // console.log("%s", i);
-          // console.logBytes32(computedHash);
         }
 
         // Check if the computed hash (root) is equal to the provided root

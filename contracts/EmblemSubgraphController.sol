@@ -3,9 +3,9 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import {EmblemLibrary} from "./EmblemLibrary.sol";
+import "@maticnetwork/fx-portal/contracts/tunnel/FxBaseRootTunnel.sol";
 
-contract EmblemSubgraphController is AccessControl {
+contract EmblemSubgraphController is AccessControl, FxBaseRootTunnel {
     
     event MerkleRootPosted(bytes32 indexed _root, uint32 _startingIndex, uint32 _treeSize);
     event BadgeDefinitionCreated(uint32 indexed _definitionNumber, uint32 _metric, uint256 _threshold);
@@ -13,7 +13,7 @@ contract EmblemSubgraphController is AccessControl {
 
     uint32 public nextBadgeDefinitionNumber;
 
-    constructor() {
+    constructor(address _checkpointManager, address _fxRoot) FxBaseRootTunnel(_checkpointManager, _fxRoot) {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         nextBadgeDefinitionNumber = 0;
     }
@@ -25,7 +25,7 @@ contract EmblemSubgraphController is AccessControl {
     ) public {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Caller is not EmblemSubgraphController admin");
         emit MerkleRootPosted(merkleRoot, startingIndex, treeSize);
-
+        _sendMessageToChild(abi.encode(merkleRoot));
         // todo: relay merkle root to Polygon contract
     }
 
@@ -43,5 +43,17 @@ contract EmblemSubgraphController is AccessControl {
     ) public {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Caller is not EmblemSubgraphController admin");
         emit BadgeDefinitionFrozen(definitionNumber);
+    }
+
+
+
+
+
+
+    function _processMessageFromChild(bytes memory data) internal override {
+    }
+
+    function sendMessageToChild(bytes memory message) public {
+        _sendMessageToChild(message);
     }
 }

@@ -57,7 +57,7 @@ describe("Badge Merkle Drop", function () {
 });
 
 describe("Emblem Subgraph Controller", function () {
-  it("Should emit MerkleRootPosted events when roots are posted", async function () {
+  it("Should not fail when posting merkle roots", async function () {
     const client = new GraphQLClient(EMBLEM_GQL_ENDPOINT);
     const leaves = await getLeavesFromSubgraph(0, 256, client);
     const hashedLeaves = leaves.map(earnedBadgeCount => hashEarnedBadge(earnedBadgeCount.earnedBadge));
@@ -156,7 +156,10 @@ async function deployEmblemLibraryTestContract() {
 
 async function deploySubgraphControllerContract() {
   const subgraphControllerContractFactory = await ethers.getContractFactory(EMBLEM_SUBGRAPH_CONTROLLER_CONTRACT_NAME);
-  const subgraphControllerContract = await subgraphControllerContractFactory.deploy();
+  const subgraphControllerContract = await subgraphControllerContractFactory.deploy(
+    "0x2890bA17EfE978480615e330ecB65333b880928e",
+    "0x3d1d3E34f7fB6D26245E6640E1c50710eFFf15bA"
+  );
   await subgraphControllerContract.deployed();
   return subgraphControllerContract;
 }
