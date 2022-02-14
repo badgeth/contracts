@@ -5,7 +5,7 @@ const POLYGON_FX_CHILD = "0x8397259c983751DAf40400790063935a11afa28a";
 
 async function main() {
     const emblemRegistryContract = await deployEmblemRegistryContract();
-    console.log("EmblemSubgraphController contract deployed to " + emblemRegistryContract.address);
+    console.log("EmblemRegistry contract deployed to " + emblemRegistryContract.address);
 }
 
 main()
