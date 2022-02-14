@@ -25,8 +25,9 @@ contract EmblemSubgraphController is AccessControl, FxBaseRootTunnel {
     ) public {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Caller is not EmblemSubgraphController admin");
         emit MerkleRootPosted(merkleRoot, startingIndex, treeSize);
-        _sendMessageToChild(abi.encode(merkleRoot));
+
         // todo: relay merkle root to Polygon contract
+        // _sendMessageToChild(abi.encode(merkleRoot));
     }
 
     function createBadgeDefinition(

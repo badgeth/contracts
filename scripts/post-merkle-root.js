@@ -4,9 +4,9 @@ const keccak256 = require('keccak256')
 const { gql, request, GraphQLClient } = require("graphql-request");
 
 const EMBLEM_SUBGRAPH_CONTROLLER_CONTRACT_NAME = "EmblemSubgraphController";
-const EMBLEM_SUBGRAPH_CONTROLLER_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-
-const EMBLEM_GQL_ENDPOINT = "https://api.studio.thegraph.com/query/2486/test/2.1.6";
+// const EMBLEM_SUBGRAPH_CONTROLLER_ADDRESS = "0x36E8479FF502f4C56CF72525179Fb661B5CA12cf";
+const EMBLEM_SUBGRAPH_CONTROLLER_ADDRESS = "0x41781777f9F29e7F4840e5E4a531Cb2817Aa009c";
+const EMBLEM_GQL_ENDPOINT = "https://api.studio.thegraph.com/query/2486/test/2.1.8";
 const EMBLEM_EARNED_BADGE_COUNT_QUERY = gql`
     query getMerkleLeaves($startingIndex: Int, $treeSize: Int) {
         earnedBadgeCounts(first: $treeSize, skip: $startingIndex, orderBy: globalBadgeNumber) {
@@ -25,12 +25,13 @@ const EMBLEM_EARNED_BADGE_COUNT_QUERY = gql`
 async function main() {
     const client = new GraphQLClient(EMBLEM_GQL_ENDPOINT);
     const merkleRoot = await merkleRootForEarnedBadgeCountRange(0, 256, client);
+    console.log("merkle root: " + merkleRoot);
 
     const subgraphControllerContractFactory = await ethers.getContractFactory(EMBLEM_SUBGRAPH_CONTROLLER_CONTRACT_NAME);
     const subgraphControllerContract = await subgraphControllerContractFactory.attach(EMBLEM_SUBGRAPH_CONTROLLER_ADDRESS);
     console.log("Attached to SubgraphControllerContract at " + subgraphControllerContract.address);
 
-    await subgraphControllerContract.postMerkleRoot(merkleRoot, 0, 256);
+    await subgraphControllerContract.postMerkleRoot(merkleRoot, 0, 256, {nonce: 18, gasLimit: 60000});
 }
 
 main()
